@@ -1,6 +1,7 @@
 import json
 import requests
-import socket
+import smtplib
+from dns import resolver
 
 IPV4_INFO_URL = 'http://ifconfig.co/json'
 CONFIG_FILE = 'config.json'
@@ -11,8 +12,21 @@ def get_config():
 
 
 def get_old_ip():
-    return socket.gethostbyname('home.meic.dev')
+    res = resolver.Resolver()
+    res.nameservers = ['1.1.1.1']
+    answers = res.query('home.meic.dev')
+    for rdata in answers:
+        return rdata.address
 
+def send_email(config, ip):
+    smtp = smtplib.SMTP('localhost')
+    smtp.sendmail(
+        config['email_from'],
+        config['email_to'],
+        'Subject: Home IP changed\n\nIP changed to: {ip}'.format(
+            ip=ip
+        )
+    )
 
 def main():
     req = requests.get(url=IPV4_INFO_URL)
@@ -46,6 +60,8 @@ def main():
             'proxied': False,
         }
     )
+
+    send_email(config, ip)
 
 
 if __name__ == '__main__':
