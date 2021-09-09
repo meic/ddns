@@ -1,4 +1,5 @@
 import json
+import os
 import requests
 import smtplib
 from dns import resolver
@@ -9,7 +10,10 @@ class Ddns:
     CONFIG_FILE = "config.json"
 
     def __init__(self):
-        self.config = json.load(open(self.CONFIG_FILE))
+        path = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)), self.CONFIG_FILE
+        )
+        self.config = json.load(open(path))
 
     def get_old_ip(self):
         res = resolver.Resolver()
