@@ -6,7 +6,7 @@ from dns import resolver
 
 
 class Ddns:
-    IPV4_INFO_URL = "http://ifconfig.co/json"
+    IPV4_INFO_URL = "https://ipinfo.io/ip"
     CONFIG_FILE = "config.json"
 
     def __init__(self):
@@ -35,7 +35,8 @@ class Ddns:
 
         if not req.ok:
             return
-        ip = req.json()["ip"]
+
+        ip = req.text
         old_ip = self.get_old_ip()
         if ip == old_ip:
             return
